@@ -1,9 +1,15 @@
-use std::{cmp, error::Error, io};
+use std::{
+    cmp,
+    error::Error,
+    io::{self, Write},
+};
 
-use crate::light::controller::{print_controllers, update_controller, Controller};
+use crate::light::controller::{print_controllers, Controller};
 
 fn read_user_input() -> Result<String, io::Error> {
     let mut raw_input = String::new();
+    print!("> ");
+    io::stdout().flush()?;
     io::stdin().read_line(&mut raw_input)?;
     Ok(raw_input)
 }
@@ -33,26 +39,27 @@ fn handle_user_input(
     ))
 }
 
-pub fn run(controllers: Vec<Controller>) -> Result<(), Box<dyn std::error::Error>> {
+pub fn run(controllers: &mut Vec<Controller>) -> Result<(), Box<dyn std::error::Error>> {
+    print_controllers(&controllers);
     loop {
-        print_controllers(&controllers);
-
         let Ok(user_input) = read_user_input() else {
             break
         };
-
         if let Ok((cid, n)) = handle_user_input(&controllers, user_input) {
             print!(
                 "update controller {} with value {}\n",
                 &controllers[cid].path.display(),
                 n
             );
-            if let Err(err) = update_controller(&controllers[cid], n) {
+            if let Err(err) = controllers[cid].set_brightness(n) {
                 print!("{}\n", err);
                 break;
             };
+            print_controllers(&controllers);
         } else {
-            break;
+            println!("Use the following format: <list number>:<value>");
+            println!("Example: 4:255");
+            continue;
         }
     }
 

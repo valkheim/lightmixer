@@ -20,7 +20,7 @@ use tui::{
     Frame, Terminal,
 };
 
-use crate::light::controller::{update_controller, Controller};
+use crate::light::controller::Controller;
 
 struct App {
     controllers: Vec<Controller>,
@@ -38,7 +38,7 @@ impl App {
     fn render_main_block<B: Backend>(&self, f: &mut Frame<B>) {
         let block = Block::default()
             .borders(Borders::ALL)
-            .title("light mixer")
+            .title("light mixer [hjkl]")
             .title_alignment(Alignment::Center)
             .border_type(BorderType::Rounded);
         f.render_widget(block, f.size());
@@ -110,8 +110,7 @@ impl App {
             return;
         }
 
-        controller.brightness -= 1;
-        if let Err(_) = update_controller(controller, controller.brightness) {
+        if let Err(_) = controller.set_brightness(controller.brightness - 1) {
             return;
         }
     }
@@ -122,8 +121,7 @@ impl App {
             return;
         }
 
-        controller.brightness += 1;
-        if let Err(_) = update_controller(controller, controller.brightness) {
+        if let Err(_) = controller.set_brightness(controller.brightness + 1) {
             return;
         }
     }

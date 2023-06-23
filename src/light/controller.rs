@@ -26,7 +26,8 @@ impl Controller {
         })
     }
 
-    pub fn set_brightness(&self, new_brightness: u64) -> io::Result<()> {
+    pub fn set_brightness(&mut self, new_brightness: u64) -> io::Result<()> {
+        self.brightness = new_brightness;
         fs::write(self.path.join("brightness"), new_brightness.to_string())
     }
 }
@@ -55,15 +56,6 @@ pub fn discover_controllers(paths: Vec<&str>) -> Vec<Controller> {
     }
 
     controllers
-}
-
-pub fn update_controller(c: &Controller, new_brightness: u64) -> io::Result<()> {
-    // let old = c.brightness;
-    c.set_brightness(new_brightness)?;
-    // thread::sleep(Duration::from_secs(2));
-    // c.set_brightness(old)?;
-
-    Ok(())
 }
 
 pub fn print_controllers(controllers: &Vec<Controller>) {
